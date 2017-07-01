@@ -55,7 +55,7 @@ class BackpropMonitorExtension(ch.training.extension.Extension):
         """
         param_name = name if name else param.name
         old_param = self.param_history[canon_name]
-        update_ratio = (param.data - old_param) / old_param
+        update_ratio = (param.data - old_param) / (old_param+1e-15)
         if self.hist_edges is not None:
             hist, edges = np.histogram(update_ratio, bins=self.hist_edges)
             ch.reporter.report({'{}/update:hist_vals'.format(param_name):hist}, link)

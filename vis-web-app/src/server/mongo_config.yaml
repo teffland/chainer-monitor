@@ -1,0 +1,4 @@
+username: 'tom'
+host: 'teffland.cs.columbia.edu'
+database: 'experiments'
+port: 27017

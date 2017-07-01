@@ -1,0 +1,38 @@
+/* Custom styles to override the bootstrap */
+html {
+  height:100%;
+}
+
+body {
+  /*margin-bottom: 60px;*/
+  -webkit-transition:.5s; /* Safari */
+  transition:.5s;
+}
+
+body {
+  font-family: Roboto;
+}
+
+.btn-default {
+  background-color: #f7f7f9;
+  border-color: #888;
+  border-width: 1px;
+  /*box-shadow: 10px 10px 5px #888888;*/
+}
+
+.btn-default:hover {
+  background-color: rgb(192, 192, 192);
+}
+
+.footer {
+  /*position: absolute;*/
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  min-height: 60px;
+  /*background-color: #f5f5f5;*/
+}
+
+/*a:hover, a:focus {
+  color: #999 !important;
+}*/
