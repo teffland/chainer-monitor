@@ -17,7 +17,7 @@ class ActivationMonitorExtension(ch.training.extension.Extension):
     def __init__(self,
                  keys=None,
                  hist_edges=[-1e15, -1e5, -1e4, -1e3, -1e2, -1e1, -1e-1, -1e-2, -1e-3, -1e-4,
-                                 0., 1e-4, 1e-3, 1e-2, 1e-1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e15],
+                             1e-4, 1e-3, 1e-2, 1e-1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e15],
                  mean=True,
                  std=True):
         self.priority = 'PRIORITY_WRITER'
