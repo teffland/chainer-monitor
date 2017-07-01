@@ -23,6 +23,7 @@ import sh
 import socket
 import random
 import pprint
+import traceback
 
 from pymongo import MongoClient
 
@@ -171,8 +172,14 @@ def run_experiment(config, mongo_password=None):
         full_config['trainer_setup']['setup_config'] = trainer_setup_config
 
         trainer_setup_module = import_module('trainer_setup', trainer_config['setup_file'])
-        trainer, total_iterations = trainer_setup_module.setup(
+        trainer = trainer_setup_module.setup(
             trainer_setup_config, data_setup_results, model_setup_results)
+
+        # calculate the total number of expected iterations (not early stopping)
+        main_iter = trainer.updater._iterators['main']
+        N, batch_size = len(main_iter.dataset), main_iter.batch_size
+        iter_per_epoch = N//batch_size + 1 if N % batch_size else N//batch_size
+        total_iterations = trainer_setup_config['n_epoch'] * ( iter_per_epoch)
 
         # save the full configuration
         logger.info('Saving experiment configuration')
@@ -182,6 +189,7 @@ def run_experiment(config, mongo_password=None):
         # drop the db password before saving the config
         full_config['trainer_setup']['setup_config']['mongo_config'].pop('password', None)
         yaml.dump(full_config, open(osp.join(results_dir, 'full_config.yaml'),'w'))
+        full_config.pop('_id', None)
         mongo_id = db.insert_one(full_config).inserted_id
 
         # run it
@@ -202,11 +210,12 @@ Here is the configuration:\n\n<pre>{}</pre>'.format(results_dir, pprint.pformat(
                                     '[CHAINER MONITOR] - {}'.format(results_dir),
                                     '<h3>Experiment {} has successfully finished</h3>'.format(results_dir))
     except Exception as e:
-        logger.critical('FATAL EXCEPTION:\n{}'.format(e))
+        trace = traceback.print_exc()
+        logger.critical('FATAL EXCEPTION:\n{}\nStack Trace:{}'.format(e, trace))
         if 'email' in config:
             email_server.send_email(config['email'],
                                     '[CHAINER MONITOR] - {}'.format(results_dir),
-                                    '<h3>Exception:</h3>\n{}'.format(e))
+                                    '<h3>Exception:</h3>\n{}\n<b>Trace</b>:\n{}'.format(e, trace))
 
 if __name__ == '__main__':
     args = parse_args()

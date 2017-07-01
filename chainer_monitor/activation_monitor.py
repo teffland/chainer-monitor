@@ -29,8 +29,8 @@ class ActivationMonitorExtension(ch.training.extension.Extension):
 
     def _report_param_on_link(self, param, link, name=None):
         """ Report observations to link object. """
-        canon_name = '{}/{}'.format(link.name, param.name)
         param_name = name if name else param.name
+        canon_name = '{}/{}'.format(link.name, param_name)
         if self.hist_edges is not None:
             hist, edges = np.histogram(param.data, bins=self.hist_edges)
             ch.reporter.report({'{}/data:hist_vals'.format(param_name):hist}, link)

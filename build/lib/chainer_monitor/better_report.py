@@ -36,8 +36,9 @@ class BetterLogReport(LogReport):
             updater = trainer.updater
             stats_cpu['epoch'] = updater.epoch
             stats_cpu['iteration'] = updater.iteration
-            # only works with `VariableConverterUpdater`
-            stats_cpu['n_examples'] = getattr(updater, 'n_examples', 0)
+            # get total number of examples seen so far
+            main_iter = updater._iterators['main']
+            stats_cpu['n_examples'] = len(main_iter.dataset)*main_iter.epoch_detail
             stats_cpu['elapsed_time'] = trainer.elapsed_time
 
             if self._postprocess is not None:

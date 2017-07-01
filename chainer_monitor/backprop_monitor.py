@@ -54,9 +54,10 @@ class BackpropMonitorExtension(ch.training.extension.Extension):
 
         """
         param_name = name if name else param.name
-        update = param.data - self.param_history[canon_name]
+        old_param = self.param_history[canon_name]
+        update_ratio = (param.data - old_param) / old_param
         if self.hist_edges is not None:
-            hist, edges = np.histogram(update, bins=self.hist_edges)
+            hist, edges = np.histogram(update_ratio, bins=self.hist_edges)
             ch.reporter.report({'{}/update:hist_vals'.format(param_name):hist}, link)
             # only report bin edges the first time (cuts log size almost in half)
             if canon_name not in self.reported_update_edges:
@@ -64,9 +65,9 @@ class BackpropMonitorExtension(ch.training.extension.Extension):
                 self.reported_update_edges.append(canon_name)
 
         if self.mean:
-            ch.reporter.report({'{}/update:mean'.format(param_name):update.mean()}, link)
+            ch.reporter.report({'{}/update:mean'.format(param_name):update_ratio.mean()}, link)
         if self.std:
-            ch.reporter.report({'{}/update:std'.format(param_name):update.std()}, link)
+            ch.reporter.report({'{}/update:std'.format(param_name):update_ratio.std()}, link)
 
     def _report_grad_on_link(self, param, link, canon_name, name=None):
         """ Report statistics about parameter _gradients_ to the link object.
@@ -110,10 +111,10 @@ If you are monitoring an itermediate gradient, make sure the optimizer is wrappe
                         # we will miss the first iteration for uninitialized params
                         if canon_name in self.param_history:
                             self._report_update_on_link(param, link, canon_name)
-                        self.param_history[canon_name] = param.data
+                        self.param_history[canon_name] = param.data.copy()
 
             # monitor all explicitly marked variables (even if they aren't params)
             for varname, var in getattr(link, 'monitored_variables', {}).items():
                 if (self.keys is None
                         or (self.keys is not None and param.name in self.keys)):
-                    self._report_grad_on_link(var, link, varname)
+                    self._report_grad_on_link(var, link, varname, varname)

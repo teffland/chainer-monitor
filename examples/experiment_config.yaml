@@ -1,0 +1,29 @@
+email: 'teffland@cs.columbia.edu'
+title: 'A simple test experiment'
+task: 'MNIST'
+description: 'Uses a simple MLP'
+random_seed: 0
+results_dir_prefix: 'mnist_experiments/' # will be created if it doesn't exist
+
+data_setup:
+    setup_file: "data_setup_example.py"
+    setup_config:
+        # all arguments for the `setup` method provided in `setup_file`
+        data_dir: "data/mnist.json"
+
+model_setup:
+    setup_file: "models/model_setup_example.py"
+    setup_config:
+        # all arguments for the `setup` method provided in `setup_file`
+        mlp_sizes: [ 1000, 600, 10 ]
+
+trainer_setup:
+    setup_file: "trainer_setup_example.py"
+    setup_config:
+        # all arguments for the `setup` method provided in `setup_file`
+        batch_size: 256
+        adam_alpha: .001
+        n_epoch: 100
+        early_stop_patience: 20
+        evaluation_trigger: [ 1, 'epoch'] #[ 50, 'iteration']
+        checkpoint_trigger: [ 1, 'epoch'] #[ 50, 'iteration']
